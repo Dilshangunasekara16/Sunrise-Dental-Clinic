@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sunrise Dental - Dashboard</title>
+  <!-- Import Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: 'Poppins', sans-serif; margin: 0; background-color: #f8fafc; color: #334155; }
+    h1, h2, h3, h4 { font-family: 'Montserrat', sans-serif; color: #1e3a8a; }
+
+    /* Header Navigation */
+    header { background: #ffffff; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
+    header h2 { margin: 0; font-weight: 700; color: #1e3a8a; }
+    .nav-buttons { display: flex; gap: 10px; align-items: center; }
+    .nav-buttons button, .nav-buttons a { font-family: 'Poppins', sans-serif; font-weight: 500; background: transparent; color: #64748b; border: none; padding: 10px 15px; cursor: pointer; border-radius: 6px; text-decoration: none; font-size: 14px; transition: all 0.3s ease; }
+    .nav-buttons button:hover, .nav-buttons a:hover { background: #f1f5f9; color: #1e3a8a; }
+    .nav-buttons .btn-logout { background: #fee2e2; color: #ef4444; }
+    .nav-buttons .btn-logout:hover { background: #fca5a5; color: white; }
+
+    /* Main Container & Animations */
+    .container { max-width: 1000px; margin: 40px auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.04); }
+    .section { display: none; }
+    .section.active { display: block; animation: fadeSlideUp 0.5s ease-out forwards; }
+    @keyframes fadeSlideUp { 0% { opacity: 0; transform: translateY(15px); } 100% { opacity: 1; transform: translateY(0); } }
+
+    /* Forms & Inputs */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .full-width { grid-column: 1 / -1; }
+    .form-group { margin-bottom: 5px; }
+    label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px; color: #475569; }
+    input, select { width: 100%; padding: 10px 15px; border: 1px solid #cbd5e1; border-radius: 8px; font-family: 'Poppins', sans-serif; font-size: 14px; transition: all 0.3s ease; background: #f8fafc; }
+    input:focus, select:focus { border-color: #3b82f6; outline: none; background: #ffffff; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
+
+    /* Buttons */
+    .btn-submit { background: #2563eb; color: white; border: none; padding: 12px 24px; cursor: pointer; border-radius: 8px; font-size: 15px; font-weight: 500; font-family: 'Poppins', sans-serif; transition: all 0.3s ease; box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2); }
+    .btn-submit:hover { background: #1d4ed8; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(37, 99, 235, 0.3); }
+    .btn-danger { background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-family: 'Poppins', sans-serif; transition: all 0.2s; }
+    .btn-danger:hover { background: #dc2626; transform: scale(1.05); }
+
+    /* Tables & Results */
+    .result-box { margin-top: 25px; padding: 25px; border: 1px solid #e2e8f0; background: #f8fafc; border-radius: 8px; animation: fadeSlideUp 0.4s ease-out; }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+    th { background-color: #f1f5f9; font-weight: 600; text-transform: uppercase; font-size: 12px; color: #64748b; padding: 12px 15px; text-align: left;}
+    td { padding: 12px 15px; border-bottom: 1px solid #e2e8f0; font-size: 14px; }
+    tbody tr:hover { background-color: #f8fafc; transition: background-color 0.2s ease; }
+
+    /* Receipt */
+    .receipt { font-family: 'Courier New', Courier, monospace; font-size: 15px; white-space: pre-wrap; background: #fff; padding: 30px; border: 1px solid #cbd5e1; border-top: 6px solid #1e3a8a; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+  </style>
+</head>
+<body>
+
+<header>
+  <h2>Sunrise Dental</h2>
+  <div class="nav-buttons">
+    <button onclick="showSection('registerSection')">Register Appointment</button>
+    <button onclick="showSection('searchSection')">Search & Billing</button>
+    <button onclick="showSection('manageSection'); loadManageData();">Manage Clinic</button>
+    <a href="help.html">Help</a>
+    <button class="btn-logout" onclick="logout()">Logout</button>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- Register Section -->
+  <div id="registerSection" class="section active">
+    <h3 style="margin-top:0; margin-bottom: 25px;">Register New Appointment</h3>
+    <form id="registerForm" class="form-grid">
+      <div class="form-group"><label>Appointment Number:</label><input type="text" id="appointmentNo" required></div>
+      <div class="form-group"><label>Patient Name:</label><input type="text" id="patientName" required></div>
+      <div class="form-group"><label>Address:</label><input type="text" id="address" required></div>
+      <div class="form-group"><label>Contact Number:</label><input type="text" id="contactNumber" required></div>
+
+      <div class="form-group">
+        <label>Dentist Name:</label>
+        <select id="dentistName" required><option value="">-- Select Doctor --</option></select>
+      </div>
+      <div class="form-group">
+        <label>Treatment Type:</label>
+        <select id="treatmentType" required><option value="">-- Select Treatment --</option></select>
+      </div>
+
+      <div class="form-group"><label>Appointment Date:</label><input type="date" id="appointmentDate" required></div>
+      <div class="form-group"><label>Appointment Time:</label><input type="time" id="appointmentTime" required></div>
+
+      <div class="full-width" style="text-align: right; margin-top: 10px;">
+        <button type="submit" class="btn-submit">Save Appointment</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Search & Billing Section -->
+  <div id="searchSection" class="section">
+    <h3 style="margin-top:0;">Search Appointment & Generate Bill</h3>
+    <div style="display: flex; gap: 15px; align-items: flex-end; max-width: 500px;">
+      <div style="flex: 1;">
+        <label>Enter Appointment Number:</label>
+        <input type="text" id="searchId" placeholder="e.g., A4829">
+      </div>
+      <button class="btn-submit" onclick="searchAppointment()">Search</button>
+    </div>
+
+    <div id="displayArea" class="result-box" style="display:none;"></div>
+    <div style="margin-top: 15px; text-align: right;">
+      <button class="btn-submit" onclick="generateBill()" id="billBtn" style="display:none; background: #10b981;">Generate Digital Bill</button>
+    </div>
+  </div>
+
+  <!-- Manage Clinic Section -->
+  <div id="manageSection" class="section">
+    <h3 style="margin-top:0; margin-bottom: 25px;">Manage Clinic Parameters</h3>
+    <div class="form-grid">
+
+      <!-- Doctor Management -->
+      <div style="border: 1px solid #e2e8f0; padding: 25px; border-radius: 10px; background: white; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+        <h4 style="margin-top:0;">Add Doctor</h4>
+        <form id="doctorForm">
+          <div class="form-group"><label>Doctor ID:</label><input type="text" id="doctorId" placeholder="e.g. D01" required></div>
+          <div class="form-group"><label>Doctor Title:</label><input type="text" id="doctorTitle" placeholder="e.g. Dr. Smith" required></div>
+          <button type="submit" class="btn-submit" style="width: 100%; margin-top:10px;">Add Doctor</button>
+        </form>
+        <h4 style="margin-top:30px;">Saved Doctors</h4>
+        <table>
+          <thead><tr><th>ID</th><th>Name</th><th style="text-align:right;">Action</th></tr></thead>
+          <tbody id="doctorTableBody"></tbody>
+        </table>
+      </div>
+
+      <!-- Service Management -->
+      <div style="border: 1px solid #e2e8f0; padding: 25px; border-radius: 10px; background: white; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+        <h4 style="margin-top:0;">Add Service</h4>
+        <form id="serviceForm">
+          <div class="form-group"><label>Service ID:</label><input type="text" id="serviceId" placeholder="e.g. S01" required></div>
+          <div class="form-group"><label>Service Title:</label><input type="text" id="serviceTitle" placeholder="e.g. Braces" required></div>
+          <button type="submit" class="btn-submit" style="width: 100%; margin-top:10px;">Add Service</button>
+        </form>
+        <h4 style="margin-top:30px;">Saved Services</h4>
+        <table>
+          <thead><tr><th>ID</th><th>Title</th><th style="text-align:right;">Action</th></tr></thead>
+          <tbody id="serviceTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // --- INITIALIZATION ---
+  function generateAppointmentNumber() {
+    const randomNum = Math.floor(1000 + Math.random() * 9000);
+    document.getElementById('appointmentNo').value = 'A' + randomNum;
+  }
+
+  async function loadDropdowns() {
+    try {
+      const docRes = await fetch('/api/doctors');
+      if (docRes.ok) {
+        const doctors = await docRes.json();
+        document.getElementById('dentistName').innerHTML = '<option value="">-- Select Doctor --</option>' +
+                doctors.map(d => `<option value="${d.doctorTitle}">${d.doctorTitle}</option>`).join('');
+      }
+      const srvRes = await fetch('/api/services');
+      if (srvRes.ok) {
+        const services = await srvRes.json();
+        document.getElementById('treatmentType').innerHTML = '<option value="">-- Select Treatment --</option>' +
+                services.map(s => `<option value="${s.serviceTitle}">${s.serviceTitle}</option>`).join('');
+      }
+    } catch (error) { console.error("Dropdown error:", error); }
+  }
+
+  window.onload = function() { generateAppointmentNumber(); loadDropdowns(); };
+
+  // --- NAVIGATION & AUTH ---
+  function showSection(sectionId) {
+    document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+    document.getElementById(sectionId).classList.add('active');
+    document.getElementById('displayArea').style.display = 'none';
+    document.getElementById('billBtn').style.display = 'none';
+  }
+
+  function logout() {
+    if(confirm("Are you sure you want to exit the system?")) window.location.href = 'index.html';
+  }
+
+  // --- APPOINTMENT REGISTRATION ---
+  document.getElementById('registerForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const payload = {
+      appointmentNo: document.getElementById('appointmentNo').value,
+      patientName: document.getElementById('patientName').value,
+      address: document.getElementById('address').value,
+      contactNumber: document.getElementById('contactNumber').value,
+      dentistName: document.getElementById('dentistName').value,
+      treatmentType: document.getElementById('treatmentType').value,
+      appointmentDate: document.getElementById('appointmentDate').value,
+      appointmentTime: document.getElementById('appointmentTime').value
+    };
+
+    try {
+      const response = await fetch('/api/appointments', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+      });
+      if (response.ok) {
+        alert('Appointment registered successfully!');
+        document.getElementById('registerForm').reset();
+        generateAppointmentNumber();
+      } else alert('Error saving appointment.');
+    } catch (error) { console.error("Server error:", error); }
+  });
+
+  // --- APPOINTMENT SEARCH & BILLING ---
+  async function searchAppointment() {
+    const id = document.getElementById('searchId').value;
+    const displayArea = document.getElementById('displayArea');
+    if(!id) return;
+
+    try {
+      const response = await fetch(`/api/appointments?id=${id}`);
+      if (response.ok) {
+        const data = await response.json();
+        displayArea.style.display = 'block';
+        displayArea.innerHTML = `
+                        <h4 style="margin-top:0; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">Patient Overview</h4>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <p><strong>Name:</strong> ${data.patientName}</p>
+                            <p><strong>Contact:</strong> ${data.contactNumber}</p>
+                            <p><strong>Dentist:</strong> ${data.dentistName}</p>
+                            <p><strong>Treatment:</strong> ${data.treatmentType}</p>
+                            <p><strong>Date & Time:</strong> ${data.appointmentDate} at ${data.appointmentTime}</p>
+                        </div>
+                    `;
+        document.getElementById('billBtn').style.display = 'inline-block';
+      } else {
+        alert('Appointment not found.');
+        displayArea.style.display = 'none';
+        document.getElementById('billBtn').style.display = 'none';
+      }
+    } catch (error) { console.error(error); }
+  }
+
+  async function generateBill() {
+    const id = document.getElementById('searchId').value;
+    try {
+      const response = await fetch(`/api/billing?id=${id}`);
+      if (response.ok) {
+        const bill = await response.json();
+        document.getElementById('displayArea').innerHTML = `
+                        <div class="receipt">
+                            <h2 style="text-align:center; margin:0;">SUNRISE DENTAL CLINIC</h2>
+                            <p style="text-align:center; color:#64748b; margin-top:5px;">Official Payment Receipt</p>
+                            <hr style="border: 1px dashed #cbd5e1; margin: 20px 0;">
+                            <p><strong>Appt No:</strong> ${bill.appointmentNo}   <strong style="float:right">Date:</strong> <span style="float:right">${bill.date}</span></p>
+                            <p><strong>Patient:</strong> ${bill.patientName}</p>
+                            <p><strong>Doctor:</strong> ${bill.dentistName}</p>
+                            <hr style="border: 1px dashed #cbd5e1; margin: 20px 0;">
+                            <p>Treatment (${bill.treatmentType}): <span style="float:right">${bill.currency} ${bill.treatmentFee.toFixed(2)}</span></p>
+                            <p>Consultation Fee: <span style="float:right">${bill.currency} ${bill.consultationFee.toFixed(2)}</span></p>
+                            <hr style="border: 1px dashed #cbd5e1; margin: 20px 0;">
+                            <h3 style="text-align:right; margin:0; color:#1e3a8a;">TOTAL: ${bill.currency} ${bill.totalCost.toFixed(2)}</h3>
+                            <div style="text-align:center; margin-top:30px;">
+                                <p style="font-size:12px; color:#94a3b8;">Thank you for trusting Sunrise Dental!</p>
+                                <button class="btn-submit" onclick="window.print()" style="margin-top:10px;">Print Receipt</button>
+                            </div>
+                        </div>
+                    `;
+        document.getElementById('billBtn').style.display = 'none';
+      }
+    } catch (error) { console.error(error); }
+  }
+
+  // --- MANAGE CLINIC LOGIC ---
+  async function loadManageData() {
+    // Doctors
+    const docRes = await fetch('/api/doctors');
+    if (docRes.ok) {
+      const doctors = await docRes.json();
+      document.getElementById('doctorTableBody').innerHTML = doctors.map(d =>
+              `<tr><td>${d.doctorId}</td><td>${d.doctorTitle}</td><td style="text-align:right;"><button class="btn-danger" onclick="deleteDoctor('${d.doctorId}')">Delete</button></td></tr>`
+      ).join('');
+    }
+    // Services
+    const srvRes = await fetch('/api/services');
+    if (srvRes.ok) {
+      const services = await srvRes.json();
+      document.getElementById('serviceTableBody').innerHTML = services.map(s =>
+              `<tr><td>${s.serviceId}</td><td>${s.serviceTitle}</td><td style="text-align:right;"><button class="btn-danger" onclick="deleteService('${s.serviceId}')">Delete</button></td></tr>`
+      ).join('');
+    }
+    loadDropdowns();
+  }
+
+  document.getElementById('doctorForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const payload = { doctorId: document.getElementById('doctorId').value, doctorTitle: document.getElementById('doctorTitle').value };
+    const res = await fetch('/api/doctors', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
+    if (res.ok) { document.getElementById('doctorForm').reset(); loadManageData(); }
+  });
+
+  async function deleteDoctor(id) {
+    if (confirm("Delete this doctor?")) {
+      const res = await fetch(`/api/doctors?id=${id}`, { method: 'DELETE' });
+      if (res.ok) loadManageData();
+    }
+  }
+
+  document.getElementById('serviceForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const payload = { serviceId: document.getElementById('serviceId').value, serviceTitle: document.getElementById('serviceTitle').value };
+    const res = await fetch('/api/services', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
+    if (res.ok) { document.getElementById('serviceForm').reset(); loadManageData(); }
+  });
+
+  async function deleteService(id) {
+    if (confirm("Delete this service?")) {
+      const res = await fetch(`/api/services?id=${id}`, { method: 'DELETE' });
+      if (res.ok) loadManageData();
+    }
+  }
+</script>
+</body>
+</html>
